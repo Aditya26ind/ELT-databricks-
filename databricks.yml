@@ -2,9 +2,6 @@ bundle:
   name: databricks-elt-pipeline
 
 variables:
-  node_type:
-    description: Cluster node type
-    default: m4.xlarge
   s3_bucket:
     description: S3 bucket name
     default: your-bucket
@@ -19,24 +16,21 @@ resources:
         timezone_id: UTC
         pause_status: UNPAUSED
 
+      environments:
+        - environment_key: default
+          spec:
+            client: "1"
+            dependencies:
+              - python-dotenv>=1.0.0
+              - boto3>=1.26.0
+
       tasks:
         - task_key: run_etl
           spark_python_task:
             python_file: ./run.py
-          new_cluster:
-            spark_version: 15.4.x-scala2.12
-            node_type_id: ${var.node_type}
-            num_workers: 2
-            spark_env_vars:
-              PRODUCTION: "true"
-              S3_BUCKET: ${var.s3_bucket}
-              AWS_ACCESS_KEY_ID: "{{secrets/aws/access_key_id}}"
-              AWS_SECRET_ACCESS_KEY: "{{secrets/aws/secret_access_key}}"
-          libraries:
-            - pypi:
-                package: python-dotenv>=1.0.0
-            - pypi:
-                package: boto3>=1.26.0
+            parameters:
+              - "--production=true"
+          environment_key: default
 
 targets:
   prod:
@@ -45,4 +39,3 @@ targets:
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
     variables:
       s3_bucket: your-prod-bucket
-      node_type: m4.xlarge
