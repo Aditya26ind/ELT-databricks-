@@ -43,8 +43,6 @@ targets:
     mode: production
     workspace:
       root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}
-    run_as:
-      user_name: ${workspace.current_user.userName}
     variables:
       s3_bucket: your-prod-bucket
       node_type: m4.xlarge
