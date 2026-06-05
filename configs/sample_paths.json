@@ -1,0 +1,5 @@
+{
+  "raw_path": "s3a://your-bucket/raw/orders_raw.csv",
+  "staging_path": "s3a://your-bucket/staging/orders_delta",
+  "output_path": "s3a://your-bucket/output/orders_summary"
+}

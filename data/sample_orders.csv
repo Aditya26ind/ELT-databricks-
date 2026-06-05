@@ -1,0 +1,4 @@
+order_id,customer_id,order_date,amount,product_category
+1001,200,2026-06-01,120.50,electronics
+1002,201,2026-06-02,75.00,grocery
+1003,200,2026-06-03,45.00,books
