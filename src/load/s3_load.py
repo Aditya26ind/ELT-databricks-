@@ -1,4 +1,3 @@
-from delta.tables import DeltaTable
 from ..utils.logger import get_logger
 
 logger = get_logger(__name__)
@@ -16,6 +15,7 @@ def load_to_table(df, table_name: str, mode: str = "overwrite"):
 
 def load_to_s3(df, s3_path: str, mode: str = "overwrite"):
     """Production: saves to your own S3 bucket as a Delta table."""
+    from delta.tables import DeltaTable
     spark = df.sparkSession
     if DeltaTable.isDeltaTable(spark, s3_path):
         df.write.format("delta").mode(mode).save(s3_path)
