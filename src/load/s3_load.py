@@ -7,9 +7,9 @@ def load_to_table(df, table_name: str, mode: str = "overwrite"):
     """Trial: saves to Databricks-managed Unity Catalog table."""
     spark = df.sparkSession
     if spark.catalog.tableExists(table_name):
-        df.write.format("delta").mode(mode).saveAsTable(table_name)
+        df.write.format("delta").mode(mode).option("overwriteSchema", "true").saveAsTable(table_name)
     else:
-        df.write.format("delta").mode("overwrite").saveAsTable(table_name)
+        df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(table_name)
     logger.info(f"Loaded to Unity Catalog table: {table_name}")
 
 
