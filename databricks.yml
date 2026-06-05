@@ -24,7 +24,6 @@ resources:
               - python-dotenv>=1.0.0
               - boto3>=1.26.0
               - pandas>=2.2.0
-              - delta-spark>=3.0.0
 
       tasks:
         - task_key: run_etl
