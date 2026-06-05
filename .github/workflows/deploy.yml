@@ -6,9 +6,19 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: databricks-prod-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
 
     steps:
       - name: Checkout code
@@ -17,8 +27,26 @@ jobs:
       - name: Install Databricks CLI
         uses: databricks/setup-cli@main
 
+      - name: Verify deployment secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${DATABRICKS_HOST}" ]]; then
+            echo "Missing required GitHub secret: DATABRICKS_HOST" >&2
+            exit 1
+          fi
+
+          if [[ -z "${DATABRICKS_TOKEN}" ]]; then
+            echo "Missing required GitHub secret: DATABRICKS_TOKEN" >&2
+            exit 1
+          fi
+
+      - name: Verify Databricks authentication
+        run: databricks current-user me
+
+      - name: Validate Databricks bundle
+        run: databricks bundle validate --target prod
+
       - name: Deploy bundle to prod
-        env:
-          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: databricks bundle deploy --target prod

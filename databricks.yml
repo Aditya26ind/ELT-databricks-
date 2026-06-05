@@ -9,9 +9,6 @@ variables:
     description: S3 bucket name
     default: your-bucket
 
-workspace:
-  host: ${DATABRICKS_HOST}
-
 resources:
   jobs:
     elt_pipeline_job:
@@ -45,7 +42,12 @@ targets:
   prod:
     mode: production
     workspace:
-      host: ${DATABRICKS_HOST}
+      root_path: /Shared/production/.bundle/${bundle.name}/${bundle.target}
+    run_as:
+      user_name: ${workspace.current_user.userName}
+    permissions:
+      - user_name: ${workspace.current_user.userName}
+        level: CAN_MANAGE
     variables:
       s3_bucket: your-prod-bucket
       node_type: m4.xlarge
