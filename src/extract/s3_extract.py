@@ -9,8 +9,16 @@ logger = get_logger(__name__)
 
 
 def extract_local() -> DataFrame:
-    """Trial: reads local CSV and sends to cluster via Databricks Connect."""
     spark = get_spark()
+
+    if os.getenv("ON_DATABRICKS"):
+        # Running as a bundle job — use spark.read directly on the uploaded file
+        bundle_root = os.getenv("BUNDLE_FILES_ROOT", "")
+        csv_path = f"file:{bundle_root}/data/sample_orders.csv"
+        logger.info(f"Reading CSV from bundle: {csv_path}")
+        return spark.read.format("csv").option("header", "true").load(csv_path)
+
+    # Running locally via Databricks Connect — use pandas to send data to cluster
     csv_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/sample_orders.csv"))
     logger.info(f"Reading local CSV: {csv_path}")
     return spark.createDataFrame(pd.read_csv(csv_path))
